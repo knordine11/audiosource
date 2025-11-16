@@ -24,11 +24,11 @@
 #include <math.h>
 #include <stdlib.h>
 
-double rec_arr[1000000];
-int rec_arr_cnt = 0;
-int frame_start = 0;
-int frame_size = 2048;
-int frame_end = frame_start + frame_size;
+extern double rec_arr[];
+extern int rec_arr_cnt;
+extern int frame_start;
+extern int frame_size;
+extern int frame_end;
 
 AudioInfo::AudioInfo(const QAudioFormat &format) : m_format(format) { }
 
