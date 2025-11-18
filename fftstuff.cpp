@@ -4,61 +4,6 @@
 #include <cmath>
 #include <iomanip>
 
-// FftStuff::FftStuff(QObject *parent)
-//     : QObject{parent}
-// {
-
-// }
-
-// void FftStuff::DoIt()
-// {
-//     fftw_complex* in, * out;
-//     fftw_plan p;
-
-//     const size_t N = 512;
-//     in = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * N);
-//     out = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * N);
-//     p = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
-
-//     double Pi = 3.14159265358979323846;
-//     double Fs = 44100.0/64;
-//     double freq = 200.0;
-//     double T = 1.0 / Fs;
-//     for (size_t i = 0; i < N; i++)
-//     {
-//         in[i][0] = std::cos(2 * Pi * freq * i * T);
-//         in[i][1] = 0.0;
-//     }
-
-//     fftw_execute(p); /* repeat as needed */
-
-//     std::cout << std::fixed;
-//     std::cout << std::setprecision(2);
-//     for (size_t i = 0; i < N; i++)
-//     {
-//         std::cout << FftStuff::bin_freq(i, N, Fs) << " Hz : " << FftStuff::abs(out[i]) << std::endl;
-//     }
-
-//     fftw_destroy_plan(p);
-//     fftw_free(in);
-//     fftw_free(out);
-// }
-
-// double FftStuff::abs(fftw_complex c)
-// {
-//     return std::sqrt(c[0] * c[0] + c[1] * c[1]);
-// }
-
-// double FftStuff::bin_freq(size_t n, size_t Fs, double N)
-// {
-//     return n * Fs / N;
-
-// }
-//--------------------------------------------------------------------------------------------
-// fftstuff.ccp 11/8/25
-// fftstuff_2b   WORKING WITH TRUE PEAK DETECT for file back up
-// #include <QChart>
-
 #include "fftstuff.h"
 #include <iostream>
 #include "fftw3/fftw3.h"
@@ -81,8 +26,6 @@ const int N = 16384*4; // 2^14 * 4 =  2^16 = 65,536
 double bin_size = Fs/N;
 
 fftw_complex* in, * out;
-// in = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * N);
-// out = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * N);
 
 double last_peak = 0;
 double peak_val = 0;
@@ -97,7 +40,6 @@ double TlevL = 0;
 double TlevH = 0;
 
 double levA = 0;
-
 
 double move_by = 0;
 double freq_got =0;
@@ -132,7 +74,7 @@ void FftStuff:: make_sin(double freq ,int beg, int leng){
 void FftStuff::look_rec_arr(int beg, int lengh)
 {
     int end = beg + lengh;
-    cout << endl << "------------->    " << beg  << " { look_rec_arr < "<<lengh<<" > } " << end << endl;
+    cout << endl << "-----FftStuff-----> " << beg  << " { look_rec_arr < "<<lengh<<" > } " << end << endl;
     int i = beg;
     while (i < end) {
         cout << i << " >  " << rec_arr[i]<<endl;
@@ -208,46 +150,41 @@ void FftStuff::DoIt(int beg, int lengh)
     // PROSSES FFT OUT PUT   AND GET TRUE PEAKS
     cout << endl << "  got here    PROSSES FFT OUT PUT   AND GET TRUE PEAKS "<<endl<<endl;
 
-    Flag_up = true;
-    peak_val = 0;
+  /*  Flag_up = true;
+    peak_val = 0*/;
     double last_lev = 0;
     int last_peak = 0;
     double last_peak_val =0;
     bool up = true;
-    bool peak_looking = true;
 
     for(int i = 20; i<6000; i++){
         double val_out = abs(out[i]);
-        // cout << i <<" ll "<< last_lev<<" vo "<<val_out <<endl<<endl;
+        cout << i <<" ll "<< last_lev<<" vo "<<val_out <<"  up "<<up<<endl;
         if(up)
         {
             if(last_lev > val_out)
-            { // peak found @ i-1
+                { // peak found @ i-1
                 int peak = i-1;
                 cout<<" FOUND PEAK AT  BIN  "<< peak <<"  :  " << last_lev << endl;
-                if(peak_looking)
-                {
-                    if(last_peak_val>last_lev){
-                        cout <<endl<< "    TRUE PEAK AT  { BIN "<< last_peak << " }  level "<< last_peak_val
-                             <<endl;
-                        bin_to_freq(last_peak);
-                        peak_looking = false;
-                    }
-                }
-                last_peak_val = last_lev;
-                last_peak = i-1;
-                up = false;
-            }
-        }
-        else {  // not going up     DOWN
-            if(last_lev < val_out)  // found bottom
-            {
-                up = true;
-            }
-        }
-        last_lev = val_out;
+                // if(peak_looking)
 
+                if(last_peak_val>last_lev){
+                    cout <<endl<< "    TRUE PEAK AT  { BIN "<< last_peak << " }  level "<< last_peak_val
+                             <<endl;
+                    bin_to_freq(last_peak);
+                        // peak_looking = false;
+                    }
+
+                last_peak_val = last_lev;
+                last_peak = peak;
+                up = false;
+                }
+        }
+    cout <<"** ";
+    if(val_out>last_lev){up=true;}
+    last_lev = val_out;
     }
+
     // ****
     // fftw_destroy_plan(p);
     // fftw_free(in);

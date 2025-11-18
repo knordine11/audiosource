@@ -11,6 +11,7 @@
 #include <QPainter>
 #include <QVBoxLayout>
 #include <QtEndian>
+#include "fftstuff.h"
 
 // #include <QTimer>
 #include <qtimer.h>
@@ -23,6 +24,7 @@
 
 #include <math.h>
 #include <stdlib.h>
+
 
 extern double rec_arr[];
 extern int rec_arr_cnt;
@@ -199,8 +201,10 @@ void InputTest::code_control(){
     qDebug() <<Qt::endl<<"  ---- STOPED  AFTER QTimer fired   test code follows ----";
     m_audioSource->stop();
     qDebug() <<"last rec_arr_cnt  "<<rec_arr_cnt;
-    look_rec_arr(000,frame_size);
-
+    // look_rec_arr(000,frame_size);
+    FftStuff fts;
+    fts.look_rec_arr(1200,frame_size);
+    fts.DoIt(1200,frame_size);
  }
 
 void InputTest::look_rec_arr(int beg, int lengh)
