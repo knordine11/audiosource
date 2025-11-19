@@ -42,9 +42,11 @@ public:
     void DoIt2(double freq);
     static double abs(fftw_complex);
     static double bin_freq(size_t, size_t, double);
+
     void save_highest_bin_peaks(int bin, double bin_amp);
     void clear_highest_peaks_arr();
-    void bin_to_freq(int bin);
+
+    double bin_to_freq(int bin);
 
     void make_sin(double freq ,int beg, int leng);
     void look_rec_arr(int beg, int end);

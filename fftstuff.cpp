@@ -20,8 +20,20 @@ int rec_arr_cnt = 0;
 int frame_start = 0;
 int frame_size = 2048;
 int frame_end = frame_start + frame_size;
+double binA1;
+double binA2;
+double binA3;
+int binNo1;
+int binNo2;
+int binNo3;
+double freq1;
+double freq2;
+double freq3;
+
 double bin_amp[3];
 int bin_no[3];
+
+
 
 double Fs = 44100;
 const int N = 16384*4; // 2^14 * 4 =  2^16 = 65,536
@@ -194,9 +206,6 @@ void FftStuff::DoIt(int beg, int lengh)
     last_lev = val_out;
     }
 
-
-
-
     // ****
     // fftw_destroy_plan(p);
     // fftw_free(in);
@@ -205,6 +214,15 @@ void FftStuff::DoIt(int beg, int lengh)
     //  HAVE THE FREQUENCY OFTHE PEAK   now  prosses it for finding the three highest peaks
 
     // HAVE THE THREE HIGHEST PEAKS     now find the fundenatal frequency
+
+    // ===================     GET FUNDEMENTAL FREQUENCY   ========================
+
+    double freq1 = bin_to_freq(binNo1);
+    double freq2 = bin_to_freq(binNo2);
+    double freq3 = bin_to_freq(binNo3);
+
+    cout<<" 1 [ " << freq1<<" ]     2 [ "<<freq2<<" ]    3 [ "<<freq3<<" ]"<<endl;
+
 
     // HAVE THE FUNDEMANTAL FREQUENCY   now  find the oct and note in the (A=440 base)
 
@@ -227,32 +245,48 @@ double FftStuff::abs(fftw_complex c)
     return std::sqrt(c[0] * c[0] + c[1] * c[1]);
 }
 
-void FftStuff::save_highest_bin_peaks(int bin, double bin_amp_)
+void FftStuff::save_highest_bin_peaks(int bin, double bin_amp)
 {
-    cout <<"FROM save_highest_bin_peaks         [ "<< bin_no[0]<<" ]  "<<bin_amp[0]
-         <<"     [ "<< bin_no[1]<<" ]  "<<bin_amp[1]
-         <<"     [ "<< bin_no[2]<<" ] "<<bin_amp[2]<<endl;
-    if(bin_amp_ > bin_amp[0]){
-        bin_amp[2]=bin_amp[1]; bin_no[2] = bin_no[1];
-        bin_amp[1]=bin_amp[0]; bin_no[1] = bin_no[0];
-        bin_amp[0]=bin_amp_; bin_no[0] = bin;
-        return;}
-    if(bin_amp_ > bin_amp[1]){
-        bin_amp[2]=bin_amp[1]; bin_no[2] = bin_no[1];
-        bin_amp[1]=bin_amp_; bin_no[1] = bin;
-        return;}
-    if(bin_amp_ > bin_amp[2]){
-        bin_amp[2]=bin_amp_; bin_no[2] = bin;}
-}
+    // cout <<"FROM save_highest_bin_peaks         [ "<< bin_no[0]<<" ]  "<<bin_amp[0]
+    //      <<"     [ "<< bin_no[1]<<" ]  "<<bin_amp[1]
+    //      <<"     [ "<< bin_no[2]<<" ] "<<bin_amp[2]<<endl;
+    cout<< "FROM save_highest_bin_peaks         [ "<< binNo1<<" ]  "<<binA1
+            <<"     [ "<< binNo2<<" ]  "<<binA2
+            <<"     [ "<< binNo3<<" ]  "<<binA3 <<endl;
+    // if(bin_amp_ > bin_amp[0]){
+    //     bin_amp[2]=bin_amp[1]; bin_no[2] = bin_no[1];
+    //     bin_amp[1]=bin_amp[0]; bin_no[1] = bin_no[0];
+    //     bin_amp[0]=bin_amp_; bin_no[0] = bin;
+    //     return;}
+    if(bin_amp > binA1){
+        binA3 = binA2;   binA2 = binA1;   binA1 = bin_amp;
+        binNo3 = binNo2; binNo2= binNo1;  binNo1= bin; return;}
+    if(bin_amp > binA2){
+        binA3 = binA2;   binA2 = bin_amp;
+        binNo3 = binNo2; binNo2= bin;   return;}
+    if(bin_amp > binA3){
+        binA3 = bin_amp;
+        binNo3= bin;  }
+    }
+
+    // if(bin_amp_ > bin_amp[1]){
+    //     bin_amp[2]=bin_amp[1]; bin_no[2] = bin_no[1];
+    //     bin_amp[1]=bin_amp_; bin_no[1] = bin;
+    //     return;}
+    // if(bin_amp_ > bin_amp[2]){
+    //     bin_amp[2]=bin_amp_; bin_no[2] = bin;}
+
 
 void FftStuff::clear_highest_peaks_arr()
 {
-    bin_amp[0] = 0; bin_amp[1] = 0; bin_amp[2] = 0;
-    bin_no[0]  = 0; bin_no[1]  = 0; bin_no[2]  = 0;
+    // bin_amp[0] = 0; bin_amp[1] = 0; bin_amp[2] = 0;
+    // bin_no[0]  = 0; bin_no[1]  = 0; bin_no[2]  = 0;
+    binA1 = 0;  binA2 = 0;  binA3 = 0;
+    binNo1= 0;  binNo2= 0;  binNo3= 0;
 }
 
 
-void FftStuff::bin_to_freq(int bin){
+double FftStuff::bin_to_freq(int bin){
 
     double bin_freq = bin*bin_size;
     double lev_l = abs(out[bin-1]);
@@ -306,6 +340,7 @@ void FftStuff::bin_to_freq(int bin){
     cout << "  diff = "<< diff <<"   r = "<< r << "   r/2 "<<rh <<
         "   move " << move<<endl<<
         "   freq in = "<<temp_freq<<"      freq got = "<< freq <<"      % diff = "<<p_diff<<" % "<<endl<<endl;
+    return freq;
 }
 
 
