@@ -20,6 +20,8 @@ int rec_arr_cnt = 0;
 int frame_start = 0;
 int frame_size = 2048;
 int frame_end = frame_start + frame_size;
+double bin_amp[3];
+int bin_no[3];
 
 double Fs = 44100;
 const int N = 16384*4; // 2^14 * 4 =  2^16 = 65,536
@@ -156,10 +158,11 @@ void FftStuff::DoIt(int beg, int lengh)
     int last_peak = 0;
     double last_peak_val =0;
     bool up = true;
+    bool peak_up = true;
 
     for(int i = 20; i<6000; i++){
         double val_out = abs(out[i]);
-        cout << i <<" ll "<< last_lev<<" vo "<<val_out <<"  up "<<up<<endl;
+        cout << i <<" ll "<< last_lev<<" vo "<<val_out <<"  up "<<up<<"  pup  "<<peak_up<<endl;
         if(up)
         {
             if(last_lev > val_out)
@@ -167,13 +170,19 @@ void FftStuff::DoIt(int beg, int lengh)
                 int peak = i-1;
                 cout<<" FOUND PEAK AT  BIN  "<< peak <<"  :  " << last_lev << endl;
                 // if(peak_looking)
+                //   -------- added peak_up
 
-                if(last_peak_val>last_lev){
+                if(peak_up && last_peak_val>last_lev){
                     cout <<endl<< "    TRUE PEAK AT  { BIN "<< last_peak << " }  level "<< last_peak_val
                              <<endl;
+                    save_highest_bin_peaks(last_peak,last_peak_val);
                     bin_to_freq(last_peak);
                         // peak_looking = false;
                     }
+
+                if(last_peak_val > last_lev){
+                       peak_up = false;
+                }else{ peak_up = true;}
 
                 last_peak_val = last_lev;
                 last_peak = peak;
@@ -184,6 +193,9 @@ void FftStuff::DoIt(int beg, int lengh)
     if(val_out>last_lev){up=true;}
     last_lev = val_out;
     }
+
+
+
 
     // ****
     // fftw_destroy_plan(p);
@@ -198,13 +210,45 @@ void FftStuff::DoIt(int beg, int lengh)
 
     // HAVE THE OCT AND NOTE
 
-    cout <<endl<< "    ----- AT END OF   DOIT2 --------" <<endl;
+    cout <<endl<< "    ----- AT END OF   DOIT --------" <<endl;
+
+
 }
+
+
+// -------------------   end of main   modual   -------------------------------------------
+
+
+
 
 
 double FftStuff::abs(fftw_complex c)
 {
     return std::sqrt(c[0] * c[0] + c[1] * c[1]);
+}
+
+void FftStuff::save_highest_bin_peaks(int bin, double bin_amp_)
+{
+    cout <<"FROM save_highest_bin_peaks         [ "<< bin_no[0]<<" ]  "<<bin_amp[0]
+         <<"     [ "<< bin_no[1]<<" ]  "<<bin_amp[1]
+         <<"     [ "<< bin_no[2]<<" ] "<<bin_amp[2]<<endl;
+    if(bin_amp_ > bin_amp[0]){
+        bin_amp[2]=bin_amp[1]; bin_no[2] = bin_no[1];
+        bin_amp[1]=bin_amp[0]; bin_no[1] = bin_no[0];
+        bin_amp[0]=bin_amp_; bin_no[0] = bin;
+        return;}
+    if(bin_amp_ > bin_amp[1]){
+        bin_amp[2]=bin_amp[1]; bin_no[2] = bin_no[1];
+        bin_amp[1]=bin_amp_; bin_no[1] = bin;
+        return;}
+    if(bin_amp_ > bin_amp[2]){
+        bin_amp[2]=bin_amp_; bin_no[2] = bin;}
+}
+
+void FftStuff::clear_highest_peaks_arr()
+{
+    bin_amp[0] = 0; bin_amp[1] = 0; bin_amp[2] = 0;
+    bin_no[0]  = 0; bin_no[1]  = 0; bin_no[2]  = 0;
 }
 
 
