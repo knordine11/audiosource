@@ -28,6 +28,7 @@
 #include <cmath>
 
 
+
 extern double rec_arr[];
 extern int rec_arr_cnt;
 extern int arr_size;
@@ -36,17 +37,19 @@ class FftStuff : public QObject
 {
     Q_OBJECT
 public:
+
     explicit FftStuff(QObject *parent = nullptr);
     // void DoIt();
     void DoIt(int beg, int lengh);
     void DoIt2(double freq);
-    static double abs(fftw_complex);
+    static double abs_c(fftw_complex);
     static double bin_freq(size_t, size_t, double);
 
     void save_highest_bin_peaks(int bin, double bin_amp);
     void clear_highest_peaks_arr();
 
     double bin_to_freq(int bin);
+    double get_fund_freq();
 
     void make_sin(double freq ,int beg, int leng);
     void look_rec_arr(int beg, int end);

@@ -203,8 +203,8 @@ void InputTest::code_control(){
     qDebug() <<"last rec_arr_cnt  "<<rec_arr_cnt;
     // look_rec_arr(000,frame_size);
     FftStuff fts;
-    fts.look_rec_arr(2000,frame_size);
-    fts.DoIt(2000,frame_size);
+    fts.look_rec_arr(4000,frame_size);
+    fts.DoIt(4000,frame_size);
  }
 
 void InputTest::look_rec_arr(int beg, int lengh)
