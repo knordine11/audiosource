@@ -1,25 +1,3 @@
-// #ifndef FFTSTUFF_H
-// #define FFTSTUFF_H
-
-// #include <QObject>
-// #include "fftw3/fftw3.h"
-// #include <cmath>
-
-// class FftStuff : public QObject
-// {
-//     Q_OBJECT
-// public:
-//     explicit FftStuff(QObject *parent = nullptr);
-//     void DoIt();
-//     static double abs(fftw_complex);
-//     static double bin_freq(size_t, size_t, double);
-
-
-// signals:
-// };
-
-// #endif // FFTSTUFF_H
-//-------------------------------------------
 #ifndef FFTSTUFF_H
 #define FFTSTUFF_H
 
@@ -45,11 +23,13 @@ public:
     static double abs_c(fftw_complex);
     static double bin_freq(size_t, size_t, double);
 
+
     void save_highest_bin_peaks(int bin, double bin_amp);
     void clear_highest_peaks_arr();
 
     double bin_to_freq(int bin);
     double get_fund_freq();
+
 
     void make_sin(double freq ,int beg, int leng);
     void look_rec_arr(int beg, int end);

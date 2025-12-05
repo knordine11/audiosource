@@ -3,8 +3,9 @@
 
 #include "audiosource.h"
 
-#include <QApplication>
 
+#include <QApplication>
+#include <note.h>
 int main(int argv, char **args)
 {
     QApplication app(argv, args);

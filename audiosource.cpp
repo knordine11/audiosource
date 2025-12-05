@@ -15,7 +15,7 @@
 
 // #include <QTimer>
 #include <qtimer.h>
-
+#include <note.h>
 
 #if QT_CONFIG(permissions)
 #include <QCoreApplication>
@@ -26,7 +26,7 @@
 #include <stdlib.h>
 
 
-extern double rec_arr[];
+extern double rec_arr[];    // DEFINED AS DOUBLE FOR FFTW
 extern int rec_arr_cnt;
 extern int frame_start;
 extern int frame_size;
@@ -60,7 +60,7 @@ qreal AudioInfo::calculateLevel(const char *data, qint64 len) const
 
     for (int i = 0; i < numSamples; ++i) {
             float value = m_format.normalizedSampleValue(ptr);
-            rec_arr[rec_arr_cnt]=value;
+            rec_arr[rec_arr_cnt]=value;     //  --------> DEFINED AS DOUBLE FOR FFTW
             maxValue = qMax(value, maxValue);
             ptr += channelBytes;
             rec_arr_cnt++;
@@ -216,8 +216,12 @@ void InputTest::look_rec_arr(int beg, int lengh)
         qDebug() << i << " >  " << rec_arr[i];
         i++;
         }
+    cout <<" FROM AUDIOSOURCE   ( A base) [ "<<noteA_oct<<" "<<noteA_no
+         << " ]    ( C base) [ "<<noteC_oct<<" "<<noteC_no<< " ]     acc = "<<noteA_acc<< endl<< endl;
+    QBasicTimer();
     qDebug() <<"             END IN INPUT     START OF OUTPUT";
     }
+
 
 // void InputTest::graph_rec_arr(int beg, int lengh)
 //     {
