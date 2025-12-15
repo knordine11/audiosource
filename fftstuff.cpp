@@ -14,18 +14,6 @@
 // #include <QLineSeries>
 
 using namespace std;
-// added by note class
-// double noteA_oct;
-// double noteA_no;
-// double noteA_acc;
-// double noteC_no;
-// double noteC_oct;
-
-
-
-
-
-
 
 double temp_freq = 0;   // temp used for testing only
 double rec_arr[1000000];
@@ -57,9 +45,6 @@ double hl_rem_a;
 double hl_rem_a_abs;
 double hl_l;
 double hl_h;
-
-
-
 
 double Fs = 44100;
 const int N = 16384*4; // 2^14 * 4 =  2^16 = 65,536
@@ -140,14 +125,6 @@ void FftStuff::graph_rec_arr(int beg, int lengh)
 
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-
-
-
-
-
-
-
-
 // ================         THE MAIN MODUAL STARTS         ============================
 
 void FftStuff::DoIt(int beg, int lengh)
@@ -224,56 +201,26 @@ void FftStuff::DoIt(int beg, int lengh)
 // ===================     GET FUNDEMENTAL FREQUENCY   ========================
 
     double fun_freq = FftStuff::get_fun();
-    cout <<endl<< " >>>>>>>>>>    RETURNED   FUND FREQUENCY IS >>>>>>>>>             "<< fun_freq<<endl<<endl;
+    cout <<endl<< " >>>>>>>>>> get_fun();    RETURNED   FUND FREQUENCY IS >>>>>>>>>             "<< fun_freq<<endl<<endl;
     if(fun_freq < 26){
-        cout<<endl<<"        BAD FRAME DATA   !!!!!!!!!!!    BAD FRAME DATA  "<<endl<<endl;;
+        cout<<endl<<"        BAD FRAME DATA   !!!!!!!!!!!    BAD FRAME DATA  "<<endl<<endl;
         noteA_oct = 0.0 ;    //     MEANS  BAD FRAME DATA
     }
     else{
         Note note;
-        // note.f_to_n(fun_freq);
         note.freq_to_note(fun_freq);
-
     }
     cout <<"  ( A base) --> [ "<<noteA_oct<<" "<<noteA_no   << " ]           ( C base) -->  [ "
          <<noteC_oct<<" "<<noteC_no<< " ]     acc = "<<note_acc<< endl<< endl;
-    // cout<<endl<< "    ----- AT END OF   DOIT --------" <<endl<<endl;
-
-
-
-    fun_freq = FftStuff::get_fund_freq();
-
-    cout <<endl<< " >>>>>>>>>>    RETURNED   FUND FREQUENCY IS  >>>>>>>>>             "<< fun_freq<<endl<<endl;
-    if(fun_freq < 26){
-        cout<<endl<<"        BAD FRAME DATA  !!!!!!!!!!!!  BAD FRAME DATA  "<<endl<<endl;;
-        noteA_oct = 0.0 ;    //     MEANS  BAD FRAME DATA
-    }
-    else{
-        Note note;
-        note.f_to_n(fun_freq);
-    }
-
-    cout <<"  ( A base) --> [ "<<noteA_oct<<" "<<noteA_no   << " ]           ( C base) -->  [ "
-         <<noteC_oct<<" "<<noteC_no<< " ]     acc = "<<note_acc<< endl<< endl;
-    cout<<endl<< "    ----- AT END OF   DOIT --------" <<endl<<endl;
 }
-
-
-// $$$$$$$$$$$$$$$$$$$$$   END OF MAIN CALLED MODUAL  $$$$$$$$$$$$$$$$$$$$$$$$$
-
-
-
-
 // -------------------   end of main   modual   -------------------------------------------
-
-
-
 
 
 double FftStuff::abs_c(fftw_complex c)
 {
     return std::sqrt(c[0] * c[0] + c[1] * c[1]);
 }
+
 
 void FftStuff::save_highest_bin_peaks(int bin, double bin_amp)
 {
@@ -355,96 +302,6 @@ double FftStuff::bin_to_freq(int bin){
     return freq;
 }
 
-double FftStuff::get_fund_freq(){
-    double freq1 = bin_to_freq(binNo1);
-    double freq2 = bin_to_freq(binNo2);
-    double freq3 = bin_to_freq(binNo3);
-    double freq_found = 0.0;
-    // double tol =.01;
-    double tol_floor = 6;
-    double tol_max_peak = 20;
-    double tol_3rd_peak = 10;
-    double tol_rem = 0.01;
-    double a = freq1;
-    double b = freq2;
-    double ba;
-    double ca;
-    double r_int;
-    double rem_;
-    double rem_a;
-    cout << " 1 [ " << freq1<<" ] lev "<<binA1<<endl<<
-        " 2 [ " << freq2<<" ] lev "<<binA2<<endl<<
-        " 3 [ " << freq3<<" ] lev "<<binA3<<endl<<
-        "            --- prosses starts ---             <- last lev ->  "<<binA4<<"   "<<binA5<<endl;
-
-    if(binA1 < tol_max_peak){cout<<"(1)   1st freq TOO LOW"<<endl;return 0.0;};
-    if(binA2 < tol_floor){cout<<"(2)   2nd freq TOO LOW"<<endl;return freq1;};
-
-    if(b<a){a = freq2; b = freq1;}; // set up for varables for test
-
-    ba = b/a;  r_int = round(ba);  rem_ =  r_int - ba ;  rem_a = rem_/r_int; // set up is harmonic ?
-    cout<<"(3)  ba "<<ba<<"   rint "<<r_int<<"   rem_ "<<rem_<<"   rem_a "<<rem_a<<endl;
-
-    if(abs(rem_a)<tol_rem) { // TEST  is harmonic ( YES )
-            if(a==freq1){
-                freq_found = freq1;
-                cout<<" 2nd freq = a "<<endl;
-            }else{          // ELSE NEEDS TO GET THE AVE FREQ   << *************
-            freq_found = freq2;
-            cout<<" 2nd freq = b   freq1/r_int "<<endl;
-            }
-        // DONE ABOUVE   SAVE THIS UNTILL FIXED
-        // if(a==freq1){freq_found = freq1; }          /*else{ freq_found = freq1/r_int;};*/ // ????????? DONE ELSE WHERE
-
-            if(freq3 > freq_found){ cout<<"(3A)  freq3 > freq_found   NOT LOWER FREQUENCY "<<endl;
-                return freq_found;};
-            if(binA3<tol_3rd_peak){cout<<"(3B)  binA3<tol_rem   LEVEL TOO LOW "<<endl;
-                return freq_found;};
-
-            cout<<" test for a to be  the 2nd harmonic"<<endl;
-            ba = a/freq3;  r_int = round(ba);  rem_ =  r_int - ba ;  rem_a = rem_/r_int; // set up is harmonic
-
-            if(abs(rem_a) > tol_rem){ // is NOT  a harmonic
-                cout<<"(3C) FREQ FOUND WAS  [ NOT ] THE 2ND HARMONIC "<<endl;
-                return freq_found;};
-
-            freq_found = a / r_int;
-            cout<<"(3D) FREQ FOUND  [ WAS ] THE 2ND HARMONIC "<<endl;  return freq_found;
-        };
-
-        // -------- DONE WITH FOUND HARMONICS -------------------------------------------
-    // is harmonic ( NO )
-
-    cout<<" CK for ADDINITAL harmonics "<<endl;
-
-    ba = b/(a/2);  r_int = round(ba);  rem_ =  r_int - ba ;  rem_a = rem_/r_int;
-    cout<<"(4A) 2nd Har   ba "<<ba<<"   rint "<<r_int<<"   rem_ "<<rem_<<"   rem_a "<<rem_a<<endl<<endl;
-    if(abs(rem_a)<tol_rem){
-        if(a==freq1){ freq_found = freq1/2; cout<<" 2nd freq = freq1/2 "<<endl;
-        }
-        else {freq_found = freq1/r_int; cout<<" 2nd freq = freq1/r_int"<<endl;
-        }
-        return freq_found;
-        }
-
-    cout<<" CK for 3rd harmonics "<<endl;
-
-    ba = b/(a/3);  r_int = round(ba);  rem_ =  r_int - ba ;  rem_a = rem_/r_int;
-    cout<<"(4B) 3rd Har   ba "<<ba<<"   rint "<<r_int<<"   rem_ "<<rem_<<"   rem_a "<<rem_a<<endl<<endl;
-    if(abs(rem_a)<tol_rem){
-        if(a==freq1){ freq_found = freq1/3; cout<<" 3rd freq = freq1/2 "<<endl;
-        }
-        else {freq_found = freq1/r_int; cout<<" 3rd freq = freq1/r_int"<<endl;
-        }
-        return freq_found;
-    }
-
-    cout<<"(8) NO HARMONICS WERE FOUND RETORN ZERO  "<< endl;
-    return 0.0;
-}
-
-
-
 
 double FftStuff::get_fun()
 {
@@ -452,19 +309,9 @@ double FftStuff::get_fun()
         double freq1 = bin_to_freq(binNo1);
         double freq2 = bin_to_freq(binNo2);
         double freq3 = bin_to_freq(binNo3);
-        double freq_found = 0.0;
-        // double tol =.01;
         double tol_floor = 6;
         double tol_max_peak = 20;
         double tol_3rd_peak = 10;
-        double tol_rem = 0.01;
-        double a = freq1;
-        double b = freq2;
-        double ba;
-        double ca;
-        double r_int;
-        double rem_;
-        double rem_a;
         int har_l;
         int har_h;
         int har_ = 0;
@@ -475,8 +322,6 @@ double FftStuff::get_fun()
         double diff_a;
         double move_f;
         cout<<endl<<"---------------------------------------   GET FUN  -----------------"<<endl;
-
-
         cout << " 1+ [ " << freq1<<" ] lev "<<binA1<<endl<<
             " 2 [ " << freq2<<" ] lev "<<binA2<<endl<<
             " 3 [ " << freq3<<" ] lev "<<binA3<<endl<<endl<<
@@ -489,6 +334,7 @@ double FftStuff::get_fun()
         if(h<l){l = freq2; h = freq1;}; // set up for varables for test
         har_l = harnonic(l,h);
         har_h = hl_int;
+        if(har_l == 0){return 0;}               // NO HARMONICS FOUND
         if(har_l == 1 && binA3 > tol_3rd_peak)  // CK FOR LOWEST FREQ NOT 1ST BUT 2ND FREQ ( OCT DIFF )
         {
             cout<<"                                    CK 1st freq"  <<endl;
@@ -544,6 +390,7 @@ double FftStuff::harnonic(double l, double h)
              <<"    hl_rem_a "<<  hl_rem_a<<endl;
         if(hl_rem_a_abs < .014){ return i;}  // return x harmonis number of l frequency
     }
+    cout<<"  -----       RETURING 0.0 BECAUSE NO HARMONIC FOUND "<<endl;
     return 0;   // NO HARMONIC FOUND
 }
 
