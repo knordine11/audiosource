@@ -38,6 +38,7 @@ double binA2;
 double binA3;
 double binA4;
 double binA5;
+double binA3floor = 10;
 int binNo1;
 int binNo2;
 int binNo3;
@@ -46,6 +47,20 @@ double freq2;
 double freq3;
 double bin_amp[3];
 int bin_no[3];
+
+double l;
+double h;
+double hl;
+double hl_int;
+double hl_rem;
+double hl_rem_a;
+double hl_rem_a_abs;
+double hl_l;
+double hl_h;
+
+
+
+
 double Fs = 44100;
 const int N = 16384*4; // 2^14 * 4 =  2^16 = 65,536
 double bin_size = Fs/N;
@@ -92,7 +107,7 @@ void FftStuff::look_rec_arr(int beg, int lengh)
     cout << endl << "-----FftStuff-----> " << beg  << " { look_rec_arr < "<<lengh<<" > } " << end << endl;
     int i = beg;
     while (i < end) {
-        cout << i << " >  " << rec_arr[i]<<endl;
+        // cout << i << " >  " << rec_arr[i]<<endl;
         i++;
     }
     cout <<"             END IN INPUT     START OF OUTPUT"<<endl;
@@ -122,6 +137,17 @@ void FftStuff::graph_rec_arr(int beg, int lengh)
 }
 // added end ----------------------------
 
+
+// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+
+
+
+
+
+
+
+
 // ================         THE MAIN MODUAL STARTS         ============================
 
 void FftStuff::DoIt(int beg, int lengh)
@@ -146,7 +172,7 @@ void FftStuff::DoIt(int beg, int lengh)
     }
     fftw_execute(p); /* repeat as needed */
     std::cout << std::fixed;
-    std::cout << std::setprecision(5);
+    std::cout << std::setprecision(4);
 
 // =======      PROSSES FFT OUTPUT       FIND THE HIGHEST BIN FROM FFT OUTPUT
 
@@ -167,16 +193,16 @@ void FftStuff::DoIt(int beg, int lengh)
     bool peak_up = true;
     for(int i = 20; i<6000; i++){
         double val_out = abs_c(out[i]);
-        cout << i <<" ll "<< last_lev<<" vo "<<val_out <<"  up "<<up<<"  pup  "<<peak_up<<endl;
+        // cout << i <<" ll "<< last_lev<<" vo "<<val_out <<"  up "<<up<<"  pup  "<<peak_up<<endl;
         if(up)
         {
             if(last_lev > val_out)          // peak found @ i-1
                 {
                 int peak = i-1;
-                cout<<"                    FOUND PEAK AT  BIN  "<< peak <<"  :  " << last_lev << endl;
+                // cout<<"                    FOUND PEAK AT  BIN  "<< peak <<"  :  " << last_lev << endl;
                 if(peak_up && last_peak_val>last_lev){
-                    cout <<endl<< "                 ----------    TRUE PEAK AT  { BIN "<< last_peak
-                         << " }  level "<< last_peak_val<<endl;
+                    // cout <<endl<< "                 ----------    TRUE PEAK AT  { BIN "<< last_peak
+                         // << " }  level "<< last_peak_val<<endl;
                     save_highest_bin_peaks(last_peak,last_peak_val);
                     bin_to_freq(last_peak);
                     }
@@ -188,7 +214,7 @@ void FftStuff::DoIt(int beg, int lengh)
                 up = false;
                 }
         }
-    cout <<"** ";
+    // cout <<"** ";
     if(val_out>last_lev){up=true;}
     last_lev = val_out;
     }
@@ -196,19 +222,48 @@ void FftStuff::DoIt(int beg, int lengh)
 // HAVE THE THREE HIGHEST PEAKS     now find the fundenatal frequency
     // fftw_destroy_plan(p); // SAVED FOR DONE NOW EXIT
 // ===================     GET FUNDEMENTAL FREQUENCY   ========================
-    double fun_freq = FftStuff::get_fund_freq();
 
-    cout << " >>>>>>>>>>    RETURNED   FUND FREQUENCY IS = "<< fun_freq<<endl;
+    double fun_freq = FftStuff::get_fun();
+    cout <<endl<< " >>>>>>>>>>    RETURNED   FUND FREQUENCY IS >>>>>>>>>             "<< fun_freq<<endl<<endl;
+    if(fun_freq < 26){
+        cout<<endl<<"        BAD FRAME DATA   !!!!!!!!!!!    BAD FRAME DATA  "<<endl<<endl;;
+        noteA_oct = 0.0 ;    //     MEANS  BAD FRAME DATA
+    }
+    else{
+        Note note;
+        // note.f_to_n(fun_freq);
+        note.freq_to_note(fun_freq);
 
-    Note note;
-    // note.fill_note_l();
+    }
+    cout <<"  ( A base) --> [ "<<noteA_oct<<" "<<noteA_no   << " ]           ( C base) -->  [ "
+         <<noteC_oct<<" "<<noteC_no<< " ]     acc = "<<note_acc<< endl<< endl;
+    // cout<<endl<< "    ----- AT END OF   DOIT --------" <<endl<<endl;
 
-    note.f_to_n(fun_freq);
+
+
+    fun_freq = FftStuff::get_fund_freq();
+
+    cout <<endl<< " >>>>>>>>>>    RETURNED   FUND FREQUENCY IS  >>>>>>>>>             "<< fun_freq<<endl<<endl;
+    if(fun_freq < 26){
+        cout<<endl<<"        BAD FRAME DATA  !!!!!!!!!!!!  BAD FRAME DATA  "<<endl<<endl;;
+        noteA_oct = 0.0 ;    //     MEANS  BAD FRAME DATA
+    }
+    else{
+        Note note;
+        note.f_to_n(fun_freq);
+    }
 
     cout <<"  ( A base) --> [ "<<noteA_oct<<" "<<noteA_no   << " ]           ( C base) -->  [ "
-         <<noteC_oct<<" "<<noteC_no<< " ]     acc = "<<noteA_acc<< endl<< endl;
+         <<noteC_oct<<" "<<noteC_no<< " ]     acc = "<<note_acc<< endl<< endl;
     cout<<endl<< "    ----- AT END OF   DOIT --------" <<endl<<endl;
 }
+
+
+// $$$$$$$$$$$$$$$$$$$$$   END OF MAIN CALLED MODUAL  $$$$$$$$$$$$$$$$$$$$$$$$$
+
+
+
+
 // -------------------   end of main   modual   -------------------------------------------
 
 
@@ -224,8 +279,7 @@ void FftStuff::save_highest_bin_peaks(int bin, double bin_amp)
 {
     cout<< "FROM save_highest_bin_peaks         [ "<< binNo1<<" ]  "<<binA1
             <<"     [ "<< binNo2<<" ]  "<<binA2
-            <<"     [ "<< binNo3<<" ]  "<<binA3<<"     LAST levals   "<<binA4<<"   "<<binA5 <<endl;
-
+            <<"     [ "<< binNo3<<" ]  "<<binA3<<"     LAST levals                     "<<binA4<<"   "<<binA5 <<endl;
     if(bin_amp > binA1){
         binA5 = binA4;  binA4 = binA3;   binA3 = binA2;   binA2 = binA1;   binA1 = bin_amp;
         binNo3 = binNo2; binNo2= binNo1;  binNo1= bin; return;}
@@ -273,14 +327,14 @@ double FftStuff::bin_to_freq(int bin){
     double lev_lt = lev_-lev_l;
     double lev_ht = lev_-lev_h;
 
-    cout << bin-1 << " bin_la " << bin_la << "  bin_lb " <<bin_lb<< "  bin_lc " <<bin_lc
-         << "  bin_ld " <<bin_ld
-         << "    lev_l "<<lev_l << "  | lev_la " << lev_la
-         << "  |  lev_lt " <<lev_lt         <<endl;
-    cout << bin+1 << " bin_ha " << bin_ha << "  bin_hb " <<bin_hb<< "  bin_hc " <<bin_hc
-         << "  bin_hd " <<bin_hd
-         << "    lev_h "<<lev_h << "  | lev_ha " << lev_ha
-         << "   | lev_ht " <<lev_ht         <<endl;
+    // cout <<endl<< bin-1 << " bin_la " << bin_la << "  bin_lb " <<bin_lb<< "  bin_lc " <<bin_lc
+    //      << "  bin_ld " <<bin_ld
+    //      << "    lev_l "<<lev_l << "  | lev_la " << lev_la
+    //      << "  |  lev_lt " <<lev_lt         <<endl;
+    // cout << bin+1 << " bin_ha " << bin_ha << "  bin_hb " <<bin_hb<< "  bin_hc " <<bin_hc
+    //      << "  bin_hd " <<bin_hd
+    //      << "    lev_h "<<lev_h << "  | lev_ha " << lev_ha
+    //      << "   | lev_ht " <<lev_ht         <<endl;
 
     double diff = lev_lt - lev_ht;
     double r = 0;   // used so r could be used in (if else) code
@@ -307,7 +361,7 @@ double FftStuff::get_fund_freq(){
     double freq3 = bin_to_freq(binNo3);
     double freq_found = 0.0;
     // double tol =.01;
-    double tol_floor = 10;
+    double tol_floor = 6;
     double tol_max_peak = 20;
     double tol_3rd_peak = 10;
     double tol_rem = 0.01;
@@ -385,8 +439,111 @@ double FftStuff::get_fund_freq(){
         return freq_found;
     }
 
-
     cout<<"(8) NO HARMONICS WERE FOUND RETORN ZERO  "<< endl;
     return 0.0;
+}
+
+
+
+
+double FftStuff::get_fun()
+{
+    // double FftStuff::get_fund_freq(){
+        double freq1 = bin_to_freq(binNo1);
+        double freq2 = bin_to_freq(binNo2);
+        double freq3 = bin_to_freq(binNo3);
+        double freq_found = 0.0;
+        // double tol =.01;
+        double tol_floor = 6;
+        double tol_max_peak = 20;
+        double tol_3rd_peak = 10;
+        double tol_rem = 0.01;
+        double a = freq1;
+        double b = freq2;
+        double ba;
+        double ca;
+        double r_int;
+        double rem_;
+        double rem_a;
+        int har_l;
+        int har_h;
+        int har_ = 0;
+        double fun_freq_1;
+        double fun_freq_2;
+        double fun_freq_1_2;
+        double diff_f;
+        double diff_a;
+        double move_f;
+        cout<<endl<<"---------------------------------------   GET FUN  -----------------"<<endl;
+
+
+        cout << " 1+ [ " << freq1<<" ] lev "<<binA1<<endl<<
+            " 2 [ " << freq2<<" ] lev "<<binA2<<endl<<
+            " 3 [ " << freq3<<" ] lev "<<binA3<<endl<<endl<<
+            "   THE NEW TEST   prosses starts ---   <- last lev ->  "<<binA4<<"   "<<binA5<<endl<<endl;
+
+        if(binA1 < tol_max_peak){cout<<"(1)   1st freq TOO LOW"<<endl;return 0.0;};
+        if(binA2 < tol_floor){cout<<"(2)   2nd freq TOO LOW"<<endl;return freq1;};
+
+        l = freq1;  h = freq2;
+        if(h<l){l = freq2; h = freq1;}; // set up for varables for test
+        har_l = harnonic(l,h);
+        har_h = hl_int;
+        if(har_l == 1 && binA3 > tol_3rd_peak)  // CK FOR LOWEST FREQ NOT 1ST BUT 2ND FREQ ( OCT DIFF )
+        {
+            cout<<"                                    CK 1st freq"  <<endl;
+            if(freq3 < l){
+                har_ = harnonic(freq3,h);
+                if(har_ == 1){
+                    har_l = 2;
+                    har_h = har_h * 2;
+                }
+                cout<<"               LESS THAN   freq3 < l      har_l = "<<har_l<<endl;
+            }
+            else{
+                har_ = harnonic(l,freq3);
+                if(har_ != 0){
+                    har_h = har_h * har_;}
+                cout<<"               GRATER THAN  l,freq3        har_l = "<<har_l<<endl;
+            }
+            cout<<"har_l = "<<har_l<<"    har_h = "<<har_h<<endl<<endl;
+        }
+        // HAVE har_l and har_h  NOW weight ave the two  ---------------------------------
+        if(freq1 == l){
+            fun_freq_1 = freq1 / har_l;
+            fun_freq_2 = freq2 / har_h;
+            cout<<"  FROM  IF   ";
+        }
+        else{
+            fun_freq_1 = freq1 / har_h;
+            fun_freq_2 = freq2 / har_l;
+            cout<<" FROM  ELSE       ";
+        }
+        cout<<" fun_freq_1 =  "<<fun_freq_1<<"    fun_freq_2 =  "<<fun_freq_2<<endl;
+        diff_f = fun_freq_2 - fun_freq_1;
+        diff_a = binA2/binA1;
+        move_f= diff_f * diff_a/2;
+        fun_freq_1_2 = fun_freq_1 + move_f;
+        cout<<endl<<"diff_f =  "<<diff_f<<"   diff_a =  "<<diff_a
+             <<"   move_f =  "<< move_f  <<"    <<fun_freq_1_2 =   "<<fun_freq_1_2<<endl;
+        return fun_freq_1_2;
+}
+
+
+double FftStuff::harnonic(double l, double h)
+{
+    double x = 1;
+    for(int i= 1; i < 4; i++){
+        x = i;
+        hl = h/l*x;
+        hl_int = round(hl);
+        hl_rem = (hl_int - hl);
+        hl_rem_a = hl_rem/hl_int;
+        hl_rem_a_abs = abs(hl_rem_a);
+        cout<<" "<<i<<"  hl "<<hl<<"    hl_int "<<  hl_int<<"   hl_rem "<<  hl_rem
+             <<"    hl_rem_a "<<  hl_rem_a<<endl;
+        if(hl_rem_a_abs < .014){ return i;}  // return x harmonis number of l frequency
+    }
+    return 0;   // NO HARMONIC FOUND
 }
 

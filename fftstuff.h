@@ -11,6 +11,7 @@ extern double rec_arr[];
 extern int rec_arr_cnt;
 extern int arr_size;
 
+
 class FftStuff : public QObject
 {
     Q_OBJECT
@@ -29,6 +30,9 @@ public:
 
     double bin_to_freq(int bin);
     double get_fund_freq();
+
+    double get_fun();
+    double harnonic(double freq_l, double freq_h);
 
 
     void make_sin(double freq ,int beg, int leng);

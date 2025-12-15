@@ -217,7 +217,7 @@ void InputTest::look_rec_arr(int beg, int lengh)
         i++;
         }
     cout <<" FROM AUDIOSOURCE   ( A base) [ "<<noteA_oct<<" "<<noteA_no
-         << " ]    ( C base) [ "<<noteC_oct<<" "<<noteC_no<< " ]     acc = "<<noteA_acc<< endl<< endl;
+         << " ]    ( C base) [ "<<noteC_oct<<" "<<noteC_no<< " ]     acc = "<<note_acc<< endl<< endl;
     QBasicTimer();
     qDebug() <<"             END IN INPUT     START OF OUTPUT";
     }
