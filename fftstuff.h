@@ -24,7 +24,7 @@ public:
     static double abs_c(fftw_complex);
     static double bin_freq(size_t, size_t, double);
 
-
+    void next_frame();
     void save_highest_bin_peaks(int bin, double bin_amp);
     void clear_highest_peaks_arr();
 

@@ -65,7 +65,7 @@ qreal AudioInfo::calculateLevel(const char *data, qint64 len) const
             ptr += channelBytes;
             rec_arr_cnt++;
         }
-    emit void haltstream();
+    // emit void haltstream();
     return maxValue;
 }
 
@@ -139,6 +139,15 @@ void InputTest::initializeWindow()
     connect(m_modeButton, &QPushButton::clicked, this, &InputTest::toggleMode);
     layout->addWidget(m_modeButton);
 
+
+    m_nextButton = new QPushButton(this);
+    m_nextButton->setText("next frame");
+    // connect(m_nextButton, &QPushButton::clicked, this, &InputTest::toggleMode);
+
+    layout->addWidget(m_nextButton);
+
+
+
     m_suspendResumeButton = new QPushButton(this);
     connect(m_suspendResumeButton, &QPushButton::clicked, this, &InputTest::toggleSuspend);
     layout->addWidget(m_suspendResumeButton);
@@ -205,6 +214,7 @@ void InputTest::code_control(){
     FftStuff fts;
     fts.look_rec_arr(4000,frame_size);
     fts.DoIt(4000,frame_size);
+    fts.next_frame();
  }
 
 void InputTest::look_rec_arr(int beg, int lengh)

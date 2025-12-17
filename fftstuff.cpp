@@ -122,7 +122,21 @@ void FftStuff::graph_rec_arr(int beg, int lengh)
 }
 // added end ----------------------------
 
+void FftStuff::next_frame()
+{
+    cout<<" STARTING FRAME  "<<frame_start<<endl;
+    if(rec_arr_cnt > frame_end){
+        cout<<" STARTING FRAME  "<<frame_start<<endl;
+        FftStuff fts;
+        fts.DoIt(frame_start, frame_size);
+        frame_start = frame_end;
+        frame_end = frame_end + frame_size;}
+}
 
+
+//     // DoIt(frame_start, frame_size);
+//     cout<<
+// }
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 // ================         THE MAIN MODUAL STARTS         ============================
