@@ -11,6 +11,7 @@ extern double rec_arr[];
 extern int rec_arr_cnt;
 extern int arr_size;
 
+
 class FftStuff : public QObject
 {
     Q_OBJECT
@@ -23,12 +24,15 @@ public:
     static double abs_c(fftw_complex);
     static double bin_freq(size_t, size_t, double);
 
-
+    void next_frame();
     void save_highest_bin_peaks(int bin, double bin_amp);
     void clear_highest_peaks_arr();
 
     double bin_to_freq(int bin);
     double get_fund_freq();
+
+    double get_fun();
+    double harnonic(double freq_l, double freq_h);
 
 
     void make_sin(double freq ,int beg, int leng);

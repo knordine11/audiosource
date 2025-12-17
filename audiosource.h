@@ -3,7 +3,7 @@
 
 #ifndef AUDIOINPUT_H
 #define AUDIOINPUT_H
-
+#include "fftstuff.h"
 #include "qimage.h"
 #include <QAudioSource>
 #include <QMediaDevices>
@@ -95,6 +95,7 @@ public:
     // Owned by layout
     RenderArea *m_canvas = nullptr;
     QPushButton *m_modeButton = nullptr;
+    QPushButton *m_nextButton = nullptr;
     QPushButton *m_suspendResumeButton = nullptr;
     QComboBox *m_deviceBox = nullptr;
     QSlider *m_volumeSlider = nullptr;
