@@ -401,7 +401,7 @@ double FftStuff::harnonic(double l, double h)
         hl_rem_a = hl_rem/hl_int;
         hl_rem_a_abs = abs(hl_rem_a);
         cout<<" "<<i<<"  hl "<<hl<<"    hl_int "<<  hl_int<<"   hl_rem "<<  hl_rem
-             <<"    hl_rem_a "<<  hl_rem_a<<endl;
+             <<"    hl_rem_a "<<  hl_rem_a<< "   hl_rem_a_abs "<<hl_rem_a_abs  <<endl;
         if(hl_rem_a_abs < .014){ return i;}  // return x harmonis number of l frequency
     }
     cout<<"  -----       RETURING 0.0 BECAUSE NO HARMONIC FOUND "<<endl;
