@@ -15,7 +15,6 @@
 
 // #include <QTimer>
 #include <qtimer.h>
-#include <note.h>
 
 #if QT_CONFIG(permissions)
 #include <QCoreApplication>

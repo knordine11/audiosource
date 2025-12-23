@@ -2,10 +2,8 @@
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
 #include "audiosource.h"
-
-
 #include <QApplication>
-#include <note.h>
+
 int main(int argv, char **args)
 {
     QApplication app(argv, args);

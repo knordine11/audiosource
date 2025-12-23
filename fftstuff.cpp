@@ -10,10 +10,18 @@
 #include "qpoint.h"
 #include <cmath>
 #include <iomanip>
-#include "note.h"
-// #include <QLineSeries>
 
 using namespace std;
+
+float noteA_oct;
+float noteA_no;
+float note_acc;
+float noteC_oct;
+float noteC_no;
+//  = 2^(X/12)
+float nn_l[] = {1.000000, 1.0594630944, 1.1224620483, 1.1892071150,
+                1.25992104991, 1.3348398542, 1.4142135624, 1.4983070769,
+                1.5874010520, 1.6817928305, 1.7817974363, 1.8877486254};
 
 double temp_freq = 0;   // temp used for testing only
 double rec_arr[1000000];
@@ -66,6 +74,7 @@ double move_by = 0;
 double freq_got =0;
 bool Flag_up = true;
 
+
 FftStuff::FftStuff(QObject *parent)
     : QObject{parent} { }
 
@@ -98,15 +107,7 @@ void FftStuff::look_rec_arr(int beg, int lengh)
     cout <<"             END IN INPUT     START OF OUTPUT"<<endl;
 }
 
-// //![1]   --------------------------------------------------
-// auto series = new QLineSeries;
-// for (int i = 0; i < 500; i++) {
-//     QPointF p((qreal) i, qSin(M_PI / 50 * i) * 100);
 
-//     // p.ry() += QRandomGenerator::global()->bounded(20);
-//     *series << p;
-// }
-// //![1]   -----------------------------------------------------
 
 void FftStuff::graph_rec_arr(int beg, int lengh)
 {
@@ -407,4 +408,47 @@ double FftStuff::harnonic(double l, double h)
     cout<<"  -----       RETURING 0.0 BECAUSE NO HARMONIC FOUND "<<endl;
     return 0;   // NO HARMONIC FOUND
 }
+
+
+void Note::freq_to_note(float freq)
+{
+    cout<<endl;
+    float base = 27.5;
+    int oct_a = 1;
+    int note_a_no  = 12;
+    float b_line_const = 0.9715319412;  //  2^(-1/24) BOARDER HALF WAY BETWEEN NOTES
+    float botton_line = base*2 * b_line_const;
+    cout<<"[ f_to_n ]      init  DEFIND   --->       botton_line       "  << botton_line <<endl;
+    // float botton_line =53.854;  // (((2 * base - 1.917 *base)/2) -(2 * base)
+    while(freq > botton_line){
+        oct_a ++;
+        botton_line = botton_line * 2;
+        base = base * 2;
+        // cout<<oct_a<<"  botton_line "  <<botton_line<< "    space_diff "<<space_diff<<endl;
+    }
+    // cout<<oct_a<<" [ oct ]     EXIT  base "<<base<<"  space_diff "<<space_diff<<endl;
+    noteA_oct = oct_a;
+    cout<<"  ----------------   GOT OCT A = "<<oct_a<<endl<<endl;
+
+    while(freq < botton_line){
+        cout<<" note_a_no = " << note_a_no <<"   botton_line "<<botton_line<<endl;
+        note_a_no --;
+        botton_line =nn_l[note_a_no] * base * b_line_const;
+    }
+    noteA_no = note_a_no;
+    float note_pit = base * nn_l[note_a_no] ;
+    cout<<"   ----------------------------------- HAVE NOTE"<<endl;
+    cout<<" note_a_no = " << note_a_no<<"   botton_line "<<botton_line
+         <<"          freq "<<freq<<"   note_pit "<<note_pit<<endl<<endl;
+    note_acc = ((freq/note_pit) -1) /** 1000*/;
+    cout<< "noteA_oct = "<<noteA_oct<<"    noteA_no = "<<noteA_no<<"       note_pit "<<note_pit<<"   noteA_acc "<<note_acc<<endl<<endl;
+
+    cout<<" CONVERT FROM A BASE TO C BASED"<<endl;
+    noteC_no = noteA_no -3;
+    noteC_oct = noteA_oct;
+    if(noteC_no<0){
+        noteC_no = noteC_no + 12;
+        noteC_oct --;}
+}
+
 

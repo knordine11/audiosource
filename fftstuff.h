@@ -4,12 +4,20 @@
 #include <QObject>
 #include "fftw3/fftw3.h"
 #include <cmath>
-
-
-
+#include <iostream>
 extern double rec_arr[];
 extern int rec_arr_cnt;
 extern int arr_size;
+
+using namespace std;
+extern float noteA_oct;
+extern float noteA_no;
+
+// extern float noteA_acc;
+extern float note_acc;
+extern float noteC_no;
+extern float noteC_oct;
+extern float nn_l[12];
 
 
 class FftStuff : public QObject
@@ -39,9 +47,26 @@ public:
     void look_rec_arr(int beg, int end);
     void graph_rec_arr(int beg, int end);
 
-
-
 signals:
 };
+
+class Note
+{
+public:
+    Note(){
+        // cout<<" in header   THE CONSTRUCTER"<<endl;
+        // fill_note_l();
+    };
+
+    float note_l[12];
+    void fill_note_l();
+    // void fill_note_l()
+    void f_to_n(double freq);
+    void freq_to_note(float freq);
+
+    // void harmonic(double freq_l, double freq_h);
+
+};
+
 
 #endif // FFTSTUFF_H

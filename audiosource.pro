@@ -7,13 +7,12 @@ CONFIG += add_ios_ffmpeg_libraries
 HEADERS       = audiosource.h \
     fftstuff.h \
     fftw3/fftw3.h \
-    note.h \
-    note.h
+
 
 SOURCES       = audiosource.cpp \
                 fftstuff.cpp \
                 main.cpp \
-                note.cpp
+
 
 target.path = $$[QT_INSTALL_EXAMPLES]/multimedia/audiosource
 INSTALLS += target
