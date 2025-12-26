@@ -80,6 +80,7 @@ private:
     void haltIOStream();
 
     void code_control();    // added fot test
+    void do_next_frame();
     void look_rec_arr(int beg, int end);
     void graph_rec_arr(int beg, int end);
 

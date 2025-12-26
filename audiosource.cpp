@@ -142,7 +142,7 @@ void InputTest::initializeWindow()
     m_nextButton = new QPushButton(this);
     m_nextButton->setText("next frame");
     // connect(m_nextButton, &QPushButton::clicked, this, &InputTest::toggleMode);
-
+    connect(m_nextButton, &QPushButton::clicked, this, &InputTest::do_next_frame);                                                        InputTest::do_next_frame();
     layout->addWidget(m_nextButton);
 
 
@@ -200,7 +200,7 @@ void InputTest::initializeAudio(const QAudioDevice &deviceInfo)
         }
     });
 
-    QTimer::singleShot(1000, this, &InputTest::code_control);
+    QTimer::singleShot(2000, this, &InputTest::code_control);
 }
 
 //----------------------------------------------------------------
@@ -215,6 +215,14 @@ void InputTest::code_control(){
     fts.DoIt(4000,frame_size);
     fts.next_frame();
  }
+
+void InputTest::do_next_frame()
+{
+    cout<<" NEXT FRAME "<<endl;
+}
+
+
+
 
 void InputTest::look_rec_arr(int beg, int lengh)
     {
