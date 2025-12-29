@@ -54,6 +54,7 @@ qreal AudioInfo::calculateLevel(const char *data, qint64 len) const
     const int sampleBytes = m_format.bytesPerFrame();
     const int numSamples = len / sampleBytes;
 
+    // qDebug() << "numSamples "<<numSamples<<" rec_arr_cnt  "<< rec_arr_cnt;
     float maxValue = 0;
     auto *ptr = reinterpret_cast<const unsigned char *>(data);
 
@@ -64,6 +65,16 @@ qreal AudioInfo::calculateLevel(const char *data, qint64 len) const
             ptr += channelBytes;
             rec_arr_cnt++;
         }
+    qDebug() << "numSamples "<<numSamples<<" rec_arr_cnt  "
+                 << rec_arr_cnt<< "frame_end "<<frame_end;
+        if(rec_arr_cnt > frame_end){
+            cout<<" NEXT FRAME  "<<frame_start<<endl;
+            FftStuff fts;
+            fts.DoIt(frame_start, frame_size);
+            frame_start = frame_end;
+            frame_end = frame_end + frame_size;}
+
+
     // emit void haltstream();
     return maxValue;
 }
@@ -182,9 +193,12 @@ void InputTest::initializeAudio(const QAudioDevice &deviceInfo)
     connect(m_audioInfo.get(), &AudioInfo::levelChanged, m_canvas, &RenderArea::setLevel);
 
     m_audioSource.reset(new QAudioSource(deviceInfo, format));
+    // m_audioSource->suspend();   // added fot test
+
     qreal initialVolume = QAudio::convertVolume(m_audioSource->volume(), QAudio::LinearVolumeScale,
                                                 QAudio::LogarithmicVolumeScale);
     m_volumeSlider->setValue(qRound(initialVolume * 100));
+
     m_audioInfo->start();
     restartAudioStream();
 
@@ -200,7 +214,8 @@ void InputTest::initializeAudio(const QAudioDevice &deviceInfo)
         }
     });
 
-    QTimer::singleShot(2000, this, &InputTest::code_control);
+    // QTimer::singleShot(2000, this, &InputTest::code_control);
+
 }
 
 //----------------------------------------------------------------
@@ -218,7 +233,10 @@ void InputTest::code_control(){
 
 void InputTest::do_next_frame()
 {
-    cout<<" NEXT FRAME "<<endl;
+    cout<<endl<<"                               "
+            ">>>>>>>          -------------->>>>>> NEXT FRAME <<<<<<"<<endl<<endl;
+    FftStuff fffts;
+    fffts.next_frame();
 }
 
 
@@ -270,7 +288,7 @@ void InputTest::initializeErrorWindow()
 void InputTest::restartAudioStream()
 {
     m_audioSource->stop();
-
+    qDebug()<<"m_pullMode  "<<m_pullMode;
     if (m_pullMode) {
         // pull mode: QAudioSource provides a QIODevice to pull from
         auto *io = m_audioSource->start();

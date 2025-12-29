@@ -125,7 +125,7 @@ void FftStuff::graph_rec_arr(int beg, int lengh)
 
 void FftStuff::next_frame()
 {
-    cout<<" STARTING FRAME  "<<frame_start<<endl;
+    // cout<<" STARTING FRAME  "<<frame_start<<endl;
     if(rec_arr_cnt > frame_end){
         cout<<" STARTING FRAME  "<<frame_start<<endl;
         FftStuff fts;
@@ -144,8 +144,10 @@ void FftStuff::next_frame()
 
 void FftStuff::DoIt(int beg, int lengh)
 {
+
     int at = beg;
     int end_at = beg+lengh;
+    cout<<"  FftStuff::DoIt  " <<beg<<"         "<<lengh<<  "         "<< end_at<<endl;
     fftw_plan p;
     fftw_free(in);
     fftw_free(out);
@@ -239,9 +241,9 @@ double FftStuff::abs_c(fftw_complex c)
 
 void FftStuff::save_highest_bin_peaks(int bin, double bin_amp)
 {
-    cout<< "FROM save_highest_bin_peaks         [ "<< binNo1<<" ]  "<<binA1
-            <<"     [ "<< binNo2<<" ]  "<<binA2
-            <<"     [ "<< binNo3<<" ]  "<<binA3<<"     LAST levals                     "<<binA4<<"   "<<binA5 <<endl;
+//    cout<< "FROM save_highest_bin_peaks         [ "<< binNo1<<" ]  "<<binA1
+//            <<"     [ "<< binNo2<<" ]  "<<binA2
+//           <<"     [ "<< binNo3<<" ]  "<<binA3<<"     LAST levals                     "<<binA4<<"   "<<binA5 <<endl;
     if(bin_amp > binA1){
         binA5 = binA4;  binA4 = binA3;   binA3 = binA2;   binA2 = binA1;   binA1 = bin_amp;
         binNo3 = binNo2; binNo2= binNo1;  binNo1= bin; return;}
@@ -311,9 +313,9 @@ double FftStuff::bin_to_freq(int bin){
     double move = rh * bin_size;
     double freq = bin_freq + move;
     double p_diff = ((freq/temp_freq)-1)* 100;
-    cout << "  diff = "<< diff <<"   r = "<< r << "   r/2 "<<rh <<
-        "   move " << move<<endl<<
-        "   freq in = "<<temp_freq<<"      freq got = "<< freq <<"      % diff = "<<p_diff<<" % "<<endl<<endl;
+//    cout << "  diff = "<< diff <<"   r = "<< r << "   r/2 "<<rh <<
+//        "   move " << move<<endl<<
+//       "   freq in = "<<temp_freq<<"      freq got = "<< freq <<"      % diff = "<<p_diff<<" % "<<endl<<endl;
     return freq;
 }
 
@@ -337,7 +339,7 @@ double FftStuff::get_fun()
         double diff_a;
         double move_f;
         cout<<endl<<"---------------------------------------   GET FUN  -----------------"<<endl;
-        cout << " 1+ [ " << freq1<<" ] lev "<<binA1<<endl<<
+        cout << " 1 [ " << freq1<<" ] lev "<<binA1<<endl<<
             " 2 [ " << freq2<<" ] lev "<<binA2<<endl<<
             " 3 [ " << freq3<<" ] lev "<<binA3<<endl<<endl<<
             "   THE NEW TEST   prosses starts ---   <- last lev ->  "<<binA4<<"   "<<binA5<<endl<<endl;
@@ -402,7 +404,7 @@ double FftStuff::harnonic(double l, double h)
         hl_rem_a = hl_rem/hl_int;
         hl_rem_a_abs = abs(hl_rem_a);
         cout<<" "<<i<<"  hl "<<hl<<"    hl_int "<<  hl_int<<"   hl_rem "<<  hl_rem
-             <<"    hl_rem_a "<<  hl_rem_a<< "   hl_rem_a_abs "<<hl_rem_a_abs  <<endl;
+             <<"    hl_rem_a "<<  hl_rem_a<< "     hl_rem_a_abs    =  "<<hl_rem_a_abs  <<endl;
         if(hl_rem_a_abs < .014){ return i;}  // return x harmonis number of l frequency
     }
     cout<<"  -----       RETURING 0.0 BECAUSE NO HARMONIC FOUND "<<endl;
@@ -418,7 +420,7 @@ void Note::freq_to_note(float freq)
     int note_a_no  = 12;
     float b_line_const = 0.9715319412;  //  2^(-1/24) BOARDER HALF WAY BETWEEN NOTES
     float botton_line = base*2 * b_line_const;
-    cout<<"[ f_to_n ]      init  DEFIND   --->       botton_line       "  << botton_line <<endl;
+    // cout<<"[ f_to_n ]      init  DEFIND   --->       botton_line       "  << botton_line <<endl;
     // float botton_line =53.854;  // (((2 * base - 1.917 *base)/2) -(2 * base)
     while(freq > botton_line){
         oct_a ++;
@@ -428,18 +430,18 @@ void Note::freq_to_note(float freq)
     }
     // cout<<oct_a<<" [ oct ]     EXIT  base "<<base<<"  space_diff "<<space_diff<<endl;
     noteA_oct = oct_a;
-    cout<<"  ----------------   GOT OCT A = "<<oct_a<<endl<<endl;
+    // cout<<"  ----------------   GOT OCT A = "<<oct_a<<endl<<endl;
 
     while(freq < botton_line){
-        cout<<" note_a_no = " << note_a_no <<"   botton_line "<<botton_line<<endl;
+        // cout<<" note_a_no = " << note_a_no <<"   botton_line "<<botton_line<<endl;
         note_a_no --;
         botton_line =nn_l[note_a_no] * base * b_line_const;
     }
     noteA_no = note_a_no;
     float note_pit = base * nn_l[note_a_no] ;
-    cout<<"   ----------------------------------- HAVE NOTE"<<endl;
-    cout<<" note_a_no = " << note_a_no<<"   botton_line "<<botton_line
-         <<"          freq "<<freq<<"   note_pit "<<note_pit<<endl<<endl;
+    // cout<<"   ----------------------------------- HAVE NOTE"<<endl;
+    // cout<<" note_a_no = " << note_a_no<<"   botton_line "<<botton_line
+    // <<"          freq "<<freq<<"   note_pit "<<note_pit<<endl<<endl;
     note_acc = ((freq/note_pit) -1) /** 1000*/;
     cout<< "noteA_oct = "<<noteA_oct<<"    noteA_no = "<<noteA_no<<"       note_pit "<<note_pit<<"   noteA_acc "<<note_acc<<endl<<endl;
 
