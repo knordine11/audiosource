@@ -12,12 +12,15 @@
 #include <iomanip>
 
 using namespace std;
-
-float noteA_oct;
-float noteA_no;
+bool is_tuner = true;
+int noteA_oct;
+int noteA_no;
 float note_acc;
-float noteC_oct;
-float noteC_no;
+int noteC_oct;
+int noteC_no;
+
+
+
 //  = 2^(X/12)
 float nn_l[] = {1.000000, 1.0594630944, 1.1224620483, 1.1892071150,
                 1.25992104991, 1.3348398542, 1.4142135624, 1.4983070769,
@@ -73,6 +76,10 @@ double levA = 0;
 double move_by = 0;
 double freq_got =0;
 bool Flag_up = true;
+
+int nn_compair=-1;
+int nn_compair_cnt = 0;
+
 
 
 FftStuff::FftStuff(QObject *parent)
@@ -133,8 +140,6 @@ void FftStuff::next_frame()
         frame_start = frame_end;
         frame_end = frame_end + frame_size;}
 }
-
-
 //     // DoIt(frame_start, frame_size);
 //     cout<<
 // }
@@ -179,7 +184,7 @@ void FftStuff::DoIt(int beg, int lengh)
         }
     }
     // PROSSES FFT OUT PUT   AND GET TRUE PEAKS
-    cout << endl << "  got here    PROSSES FFT OUT PUT   AND GET TRUE PEAKS "<<endl<<endl;
+    cout << endl << "  got here    PROSSES FFT OUT PUT   AND GET TRUE PEAKS "<<endl;
     double last_lev = 0;
     int last_peak = 0;
     double last_peak_val =0;
@@ -218,7 +223,9 @@ void FftStuff::DoIt(int beg, int lengh)
 // ===================     GET FUNDEMENTAL FREQUENCY   ========================
 
     double fun_freq = FftStuff::get_fun();
-    cout <<endl<< " >>>>>>>>>> get_fun();    RETURNED   FUND FREQUENCY IS >>>>>>>>>             "<< fun_freq<<endl<<endl;
+
+
+    // cout <<endl<< " >>>>>>>>>> get_fun();    RETURNED   FUND FREQUENCY IS >>>>>>>>>             "<< fun_freq<<endl<<endl;
     if(fun_freq < 26){
         cout<<endl<<"        BAD FRAME DATA   !!!!!!!!!!!    BAD FRAME DATA  "<<endl<<endl;
         noteA_oct = 0.0 ;    //     MEANS  BAD FRAME DATA
@@ -227,8 +234,13 @@ void FftStuff::DoIt(int beg, int lengh)
         Note note;
         note.freq_to_note(fun_freq);
     }
-    cout <<"  ( A base) --> [ "<<noteA_oct<<" "<<noteA_no   << " ]           ( C base) -->  [ "
-         <<noteC_oct<<" "<<noteC_no<< " ]     acc = "<<note_acc<< endl<< endl;
+
+// -------------------- HAVE OCT NOTE ACC ------------------------
+
+    // if(is_tuner){
+
+
+
 }
 // -------------------   end of main   modual   -------------------------------------------
 
@@ -341,8 +353,8 @@ double FftStuff::get_fun()
         cout<<endl<<"---------------------------------------   GET FUN  -----------------"<<endl;
         cout << " 1 [ " << freq1<<" ] lev "<<binA1<<endl<<
             " 2 [ " << freq2<<" ] lev "<<binA2<<endl<<
-            " 3 [ " << freq3<<" ] lev "<<binA3<<endl<<endl<<
-            "   THE NEW TEST   prosses starts ---   <- last lev ->  "<<binA4<<"   "<<binA5<<endl<<endl;
+            " 3 [ " << freq3<<" ] lev "<<binA3<<
+            " --------- last lev 4 , 5 ->  "<<binA4<<"   "<<binA5<<endl<<endl;
 
         if(binA1 < tol_max_peak){cout<<"(1)   1st freq TOO LOW"<<endl;return 0.0;};
         if(binA2 < tol_floor){cout<<"(2)   2nd freq TOO LOW"<<endl;return freq1;};
@@ -354,22 +366,22 @@ double FftStuff::get_fun()
         if(har_l == 0){return 0;}               // NO HARMONICS FOUND
         if(har_l == 1 && binA3 > tol_3rd_peak)  // CK FOR LOWEST FREQ NOT 1ST BUT 2ND FREQ ( OCT DIFF )
         {
-            cout<<"                                    CK 1st freq"  <<endl;
+            cout<<"                                  {  CK 1st freq  }"  <<endl;
             if(freq3 < l){
                 har_ = harnonic(freq3,h);
                 if(har_ == 1){
                     har_l = 2;
                     har_h = har_h * 2;
                 }
-                cout<<"               LESS THAN   freq3 < l      har_l = "<<har_l<<endl;
+                cout<<"             <  LESS THAN   freq3 < l      har_l = "<<har_l<<endl;
             }
             else{
                 har_ = harnonic(l,freq3);
                 if(har_ != 0){
                     har_h = har_h * har_;}
-                cout<<"               GRATER THAN  l,freq3        har_l = "<<har_l<<endl;
+                cout<<"             >  GRATER THAN  l,freq3        har_l = "<<har_l<<endl;
             }
-            cout<<"har_l = "<<har_l<<"    har_h = "<<har_h<<endl<<endl;
+            cout<<"                  har_l = "<<har_l<<"    har_h = "<<har_h<<endl<<endl;
         }
         // HAVE har_l and har_h  NOW weight ave the two  ---------------------------------
         if(freq1 == l){
@@ -388,7 +400,7 @@ double FftStuff::get_fun()
         move_f= diff_f * diff_a/2;
         fun_freq_1_2 = fun_freq_1 + move_f;
         cout<<endl<<"diff_f =  "<<diff_f<<"   diff_a =  "<<diff_a
-             <<"   move_f =  "<< move_f  <<"    <<fun_freq_1_2 =   "<<fun_freq_1_2<<endl;
+             <<"   move_f =  "<< move_f  <<"    <<      fun_freq_1_2 =   "<<fun_freq_1_2<<endl;
         return fun_freq_1_2;
 }
 
@@ -443,14 +455,16 @@ void Note::freq_to_note(float freq)
     // cout<<" note_a_no = " << note_a_no<<"   botton_line "<<botton_line
     // <<"          freq "<<freq<<"   note_pit "<<note_pit<<endl<<endl;
     note_acc = ((freq/note_pit) -1) /** 1000*/;
-    cout<< "noteA_oct = "<<noteA_oct<<"    noteA_no = "<<noteA_no<<"       note_pit "<<note_pit<<"   noteA_acc "<<note_acc<<endl<<endl;
+    // cout<< "noteA_oct = "<<noteA_oct<<"    noteA_no = "<<noteA_no<<"       note_pit "<<note_pit<<"   noteA_acc "<<note_acc<<endl<<endl;
 
-    cout<<" CONVERT FROM A BASE TO C BASED"<<endl;
+    cout<<" CONVERT FROM A BASE TO C BASED     ";
     noteC_no = noteA_no -3;
     noteC_oct = noteA_oct;
     if(noteC_no<0){
         noteC_no = noteC_no + 12;
         noteC_oct --;}
+    cout <<"  ( A base) --> [ "<<noteA_oct<<" "<<noteA_no   << " ]    ( C base) -->  [ "
+         <<noteC_oct<<" "<<noteC_no<< " ]     acc = "<<note_acc<< endl<< endl;
 }
 
 

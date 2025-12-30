@@ -10,13 +10,13 @@ extern int rec_arr_cnt;
 extern int arr_size;
 
 using namespace std;
-extern float noteA_oct;
-extern float noteA_no;
+extern int noteA_oct;
+extern int noteA_no;
 
 // extern float noteA_acc;
 extern float note_acc;
-extern float noteC_no;
-extern float noteC_oct;
+extern int noteC_no;
+extern int noteC_oct;
 extern float nn_l[12];
 
 

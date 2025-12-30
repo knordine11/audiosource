@@ -54,7 +54,6 @@ qreal AudioInfo::calculateLevel(const char *data, qint64 len) const
     const int sampleBytes = m_format.bytesPerFrame();
     const int numSamples = len / sampleBytes;
 
-    // qDebug() << "numSamples "<<numSamples<<" rec_arr_cnt  "<< rec_arr_cnt;
     float maxValue = 0;
     auto *ptr = reinterpret_cast<const unsigned char *>(data);
 
@@ -73,7 +72,6 @@ qreal AudioInfo::calculateLevel(const char *data, qint64 len) const
             fts.DoIt(frame_start, frame_size);
             frame_start = frame_end;
             frame_end = frame_end + frame_size;}
-
 
     // emit void haltstream();
     return maxValue;
