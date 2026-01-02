@@ -44,6 +44,8 @@ private:
     qreal m_level = 0.0; // 0.0 <= m_level <= 1.0
 };
 
+
+
 class RenderArea : public QWidget
 {
     Q_OBJECT
@@ -80,6 +82,8 @@ private:
     void haltIOStream();
 
     void code_control();    // added fot test
+    void stop_mic();
+
     void do_next_frame();
     void look_rec_arr(int beg, int end);
     void graph_rec_arr(int beg, int end);

@@ -28,6 +28,7 @@ float nn_l[] = {1.000000, 1.0594630944, 1.1224620483, 1.1892071150,
 
 double temp_freq = 0;   // temp used for testing only
 double rec_arr[1000000];
+float rec_arr_end =50000;
 int rec_arr_cnt = 0;
 int frame_start = 0;
 int frame_size = 2048;

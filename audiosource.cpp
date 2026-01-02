@@ -30,6 +30,8 @@ extern int rec_arr_cnt;
 extern int frame_start;
 extern int frame_size;
 extern int frame_end;
+extern float rec_arr_end;
+
 
 AudioInfo::AudioInfo(const QAudioFormat &format) : m_format(format) { }
 
@@ -65,7 +67,18 @@ qreal AudioInfo::calculateLevel(const char *data, qint64 len) const
             rec_arr_cnt++;
         }
     qDebug() << "numSamples "<<numSamples<<" rec_arr_cnt  "
-                 << rec_arr_cnt<< "frame_end "<<frame_end;
+                 << rec_arr_cnt<< "frame_end "<<frame_end<<"   "<<rec_arr_end;
+
+        if(rec_arr_cnt > rec_arr_end){
+            cout<<"\n\n END OF  rec_arr   "<<rec_arr_cnt<< "  "<< rec_arr_cnt <<endl;
+            // void haltIOStream();
+            // emit void haltstream();
+            // m_audioSource->suspend();
+
+            void stop();
+            InputTest stop_mic;
+        }
+
         if(rec_arr_cnt > frame_end){
             cout<<" NEXT FRAME  "<<frame_start<<endl;
             FftStuff fts;
@@ -121,6 +134,10 @@ void RenderArea::setLevel(qreal value)
 
 InputTest::InputTest() : m_devices(new QMediaDevices(this))
 {
+    qDebug() <<"\n\n >>>>> [ CONSTROTER of  InputTest ] <<<<  "
+                " >>>>> [ CONSTROTER of  InputTest ] <<<<   "
+                " >>>>> [ CONSTROTER of  InputTest ] <<<<  \n";
+
     init();
 }
 
@@ -150,6 +167,7 @@ void InputTest::initializeWindow()
 
     m_nextButton = new QPushButton(this);
     m_nextButton->setText("next frame");
+
     // connect(m_nextButton, &QPushButton::clicked, this, &InputTest::toggleMode);
     connect(m_nextButton, &QPushButton::clicked, this, &InputTest::do_next_frame);                                                        InputTest::do_next_frame();
     layout->addWidget(m_nextButton);
@@ -171,6 +189,8 @@ void InputTest::initializeWindow()
 
 void InputTest::initializeAudio(const QAudioDevice &deviceInfo)
 {
+    qDebug() <<"               initializeAudio  ";
+
     QAudioFormat format;
     format.setSampleRate(44100);
     format.setChannelCount(1);
@@ -218,6 +238,13 @@ void InputTest::initializeAudio(const QAudioDevice &deviceInfo)
 
 //----------------------------------------------------------------
 
+void InputTest:: stop_mic(){
+    qDebug() <<Qt::endl<<"  ---- STOPED  AFTER rec arr cnt   test code follows ----";
+    m_audioSource->stop();
+}
+
+
+
 void InputTest::code_control(){
     qDebug() <<Qt::endl<<"  ---- STOPED  AFTER QTimer fired   test code follows ----";
     m_audioSource->stop();
@@ -256,23 +283,6 @@ void InputTest::look_rec_arr(int beg, int lengh)
     }
 
 
-// void InputTest::graph_rec_arr(int beg, int lengh)
-//     {
-//         int end = beg + lengh;
-//         qDebug() <<"------------->    " << beg  << " { look_rec_arr < "<<lengh<<" > } " << end ;
-//         int i = beg;
-//         while (i < end) {
-//             qDebug() << i << " >  " << rec_arr[i];
-//             i++;
-//         }
-
-//         auto series = new QLineSeries;
-//         for (int i = 0; i < 1024; i++) {
-//             QPointF p((qreal) i,rec_arr[i]);
-//             *series << p;
-//         }
-
-
 
 void InputTest::initializeErrorWindow()
 {
@@ -286,7 +296,7 @@ void InputTest::initializeErrorWindow()
 void InputTest::restartAudioStream()
 {
     m_audioSource->stop();
-    qDebug()<<"m_pullMode  "<<m_pullMode;
+    qDebug()<<" ##   m_pullMode  "<<m_pullMode;
     if (m_pullMode) {
         // pull mode: QAudioSource provides a QIODevice to pull from
         auto *io = m_audioSource->start();
