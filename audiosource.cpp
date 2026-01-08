@@ -75,7 +75,7 @@ qreal AudioInfo::calculateLevel(const char *data, qint64 len) const
             // emit void haltstream();
             // m_audioSource->suspend();
 
-            void stop();
+            // void stop();
             InputTest stop_mic;
         }
 
@@ -187,6 +187,8 @@ void InputTest::initializeWindow()
     emit pullModeChanged();
 }
 
+//     INITIAL AUIDO ++++++++++++++++++++++++++++++++++++++++++++++++
+
 void InputTest::initializeAudio(const QAudioDevice &deviceInfo)
 {
     qDebug() <<"               initializeAudio  ";
@@ -206,6 +208,7 @@ void InputTest::initializeAudio(const QAudioDevice &deviceInfo)
 
     if (!channelCountSupported)
         format.setChannelCount(deviceInfo.preferredFormat().channelCount());
+
 
     m_audioInfo.reset(new AudioInfo(format));
     connect(m_audioInfo.get(), &AudioInfo::levelChanged, m_canvas, &RenderArea::setLevel);
@@ -240,7 +243,10 @@ void InputTest::initializeAudio(const QAudioDevice &deviceInfo)
 
 void InputTest:: stop_mic(){
     qDebug() <<Qt::endl<<"  ---- STOPED  AFTER rec arr cnt   test code follows ----";
-    m_audioSource->stop();
+    // m_audioSource->stop();
+    m_audioSource->suspend();
+
+    m_audioInfo->stop();
 }
 
 
@@ -296,7 +302,7 @@ void InputTest::initializeErrorWindow()
 void InputTest::restartAudioStream()
 {
     m_audioSource->stop();
-    qDebug()<<" ##   m_pullMode  "<<m_pullMode;
+    qDebug()<<" ##  __ _--   m_pullMode  "<<m_pullMode;
     if (m_pullMode) {
         // pull mode: QAudioSource provides a QIODevice to pull from
         auto *io = m_audioSource->start();

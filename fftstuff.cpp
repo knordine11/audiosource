@@ -28,7 +28,7 @@ float nn_l[] = {1.000000, 1.0594630944, 1.1224620483, 1.1892071150,
 
 double temp_freq = 0;   // temp used for testing only
 double rec_arr[1000000];
-float rec_arr_end =50000;
+float rec_arr_end =100000;
 int rec_arr_cnt = 0;
 int frame_start = 0;
 int frame_size = 2048;
@@ -224,19 +224,23 @@ void FftStuff::DoIt(int beg, int lengh)
 // ===================     GET FUNDEMENTAL FREQUENCY   ========================
 
     double fun_freq = FftStuff::get_fun();
-
-
-    // cout <<endl<< " >>>>>>>>>> get_fun();    RETURNED   FUND FREQUENCY IS >>>>>>>>>             "<< fun_freq<<endl<<endl;
     if(fun_freq < 26){
-        cout<<endl<<"        BAD FRAME DATA   !!!!!!!!!!!    BAD FRAME DATA  "<<endl<<endl;
-        noteA_oct = 0.0 ;    //     MEANS  BAD FRAME DATA
-    }
-    else{
-        Note note;
-        note.freq_to_note(fun_freq);
-    }
+        nn_compair = -1;        // NOT GOOD NOTE
+        nn_compair_cnt= 0;      // RESET FRAME FILTERING
+        return;}                // EXIT
 
-// -------------------- HAVE OCT NOTE ACC ------------------------
+    Note note;
+    note.freq_to_note(fun_freq);    // ans are globle
+
+// ================  HAVE NOTE  ====  NOW DO FRANE FILTERING  ==================
+
+    if(noteC_no != nn_compair) {   nn_compair = noteC_no; nn_compair_cnt = 0;}
+    else {    nn_compair_cnt++; }
+    if(nn_compair_cnt > 6){ return;}    // needs more filtering
+
+//  ======= PASSED FILTERING  =====   NOW  PROSSES A GOOD FILTERED NOTE =======
+
+
 
     // if(is_tuner){
 
@@ -461,9 +465,11 @@ void Note::freq_to_note(float freq)
     cout<<" CONVERT FROM A BASE TO C BASED     ";
     noteC_no = noteA_no -3;
     noteC_oct = noteA_oct;
+
     if(noteC_no<0){
         noteC_no = noteC_no + 12;
         noteC_oct --;}
+
     cout <<"  ( A base) --> [ "<<noteA_oct<<" "<<noteA_no   << " ]    ( C base) -->  [ "
          <<noteC_oct<<" "<<noteC_no<< " ]     acc = "<<note_acc<< endl<< endl;
 }
