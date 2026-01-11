@@ -70,6 +70,7 @@ class InputTest : public QWidget
 
 public:
     InputTest();
+    void stop_mic();
 
 signals:
     void pullModeChanged();
@@ -82,7 +83,7 @@ private:
     void haltIOStream();
 
     void code_control();    // added fot test
-    void stop_mic();
+    // void stop_mic();
 
     void do_next_frame();
     void look_rec_arr(int beg, int end);

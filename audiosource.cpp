@@ -30,7 +30,8 @@ extern int rec_arr_cnt;
 extern int frame_start;
 extern int frame_size;
 extern int frame_end;
-extern float rec_arr_end;
+// extern float rec_arr_end;
+extern int rec_arr_end;
 
 
 AudioInfo::AudioInfo(const QAudioFormat &format) : m_format(format) { }
@@ -70,17 +71,17 @@ qreal AudioInfo::calculateLevel(const char *data, qint64 len) const
                  << rec_arr_cnt<< "frame_end "<<frame_end<<"   "<<rec_arr_end;
 
         if(rec_arr_cnt > rec_arr_end){
-            cout<<"\n\n END OF  rec_arr   "<<rec_arr_cnt<< "  "<< rec_arr_cnt <<endl;
+            cout<<"\n\n END OF  rec_arr   "<<rec_arr_cnt<< "  "<< rec_arr_end <<endl;
+
             // void haltIOStream();
             // emit void haltstream();
             // m_audioSource->suspend();
-
             // void stop();
             InputTest stop_mic;
         }
 
         if(rec_arr_cnt > frame_end){
-            cout<<" NEXT FRAME  "<<frame_start<<endl;
+            cout<<" NEXT FRAME $$$$ "<<frame_start<<endl;
             FftStuff fts;
             fts.DoIt(frame_start, frame_size);
             frame_start = frame_end;
@@ -242,11 +243,15 @@ void InputTest::initializeAudio(const QAudioDevice &deviceInfo)
 //----------------------------------------------------------------
 
 void InputTest:: stop_mic(){
-    qDebug() <<Qt::endl<<"  ---- STOPED  AFTER rec arr cnt   test code follows ----";
+    qDebug() <<"\n   $$$$$$     ---- STOPED  AFTER rec arr cnt   test code follows ----";
     // m_audioSource->stop();
-    m_audioSource->suspend();
 
-    m_audioInfo->stop();
+    // m_audioSource->suspend();
+    // m_audioInfo->stop();
+    // toggleSuspend();
+    // emit pullModeChanged();
+     emit toggleSuspend();
+
 }
 
 
@@ -265,7 +270,7 @@ void InputTest::code_control(){
 void InputTest::do_next_frame()
 {
     cout<<endl<<"                               "
-            ">>>>>>>          -------------->>>>>> NEXT FRAME <<<<<<"<<endl<<endl;
+            ">>>>>>>   InputTest::do_next_frame()  ------------>>>>>> NEXT FRAME <<<<<<"<<endl<<endl;
     FftStuff fffts;
     fffts.next_frame();
 }
@@ -302,7 +307,7 @@ void InputTest::initializeErrorWindow()
 void InputTest::restartAudioStream()
 {
     m_audioSource->stop();
-    qDebug()<<" ##  __ _--   m_pullMode  "<<m_pullMode;
+    qDebug()<<" restartAudioStream() |  m_pullMode  "<<m_pullMode;
     if (m_pullMode) {
         // pull mode: QAudioSource provides a QIODevice to pull from
         auto *io = m_audioSource->start();
@@ -357,22 +362,23 @@ void InputTest::toggleMode()
     emit pullModeChanged();
 
     restartAudioStream();
-}
-
-void InputTest::toggleSuspend()
-{
+}void InputTest::toggleSuspend()
+    {
     // toggle suspend/resume
+        qDebug()<<"\n  toggleSuspend() "<<m_audioSource->state()<<"\n";
     switch (m_audioSource->state()) {
     case QAudio::SuspendedState:
         m_audioSource->resume();
+        qDebug()<<"  #1  m_audioSource->resume() ;";
         break;
     case QAudio::ActiveState:
         m_audioSource->suspend();
+        qDebug()<<"  #2   m_audioSource->suspend();";
         break;
     default:
         // no-op
         break;
-    }
+     }
 }
 
 void InputTest::deviceChanged(int index)
@@ -390,6 +396,7 @@ void InputTest::sliderChanged(int value)
                                                QAudio::LinearVolumeScale);
 
     m_audioSource->setVolume(linearVolume);
+    qDebug()<<"  sliderChanged(int value) "<<value;
 }
 
 void InputTest::updateAudioDevices()
