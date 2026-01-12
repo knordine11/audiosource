@@ -33,8 +33,9 @@ extern int frame_end;
 // extern float rec_arr_end;
 extern int rec_arr_end;
 
-
-AudioInfo::AudioInfo(const QAudioFormat &format) : m_format(format) { }
+AudioInfo::AudioInfo(const QAudioFormat &format) : m_format(format) {
+    qDebug()<<" YOU SHOULD SEE THIS ";
+}
 
 void AudioInfo::start()
 {
@@ -48,6 +49,7 @@ void AudioInfo::stop()
 
 qint64 AudioInfo::readData(char * /* data */, qint64 /* maxlen */)
 {
+    qDebug()<<" qint64 AudioInfo::readData(char * /* data */, qint64 /* maxlen */)  ";
     return 0;
 }
 
@@ -88,14 +90,21 @@ qreal AudioInfo::calculateLevel(const char *data, qint64 len) const
             frame_end = frame_end + frame_size;}
 
     // emit void haltstream();
+        if (rec_arr_cnt > 200000)
+            {
+            qDebug() << "restsrt here";
+
+            qDebug() << AudioInfo::pos();
+            }
     return maxValue;
 }
 
 qint64 AudioInfo::writeData(const char *data, qint64 len)
 {
+    qDebug() <<"  :writeData(const char *data, qint64 len)  ";
     m_level = calculateLevel(data, len);
 
-    emit levelChanged(m_level);
+    // emit levelChanged(m_level);
 
     return len;
 }
@@ -247,10 +256,11 @@ void InputTest:: stop_mic(){
     // m_audioSource->stop();
 
     // m_audioSource->suspend();
-    // m_audioInfo->stop();
-    // toggleSuspend();
+    m_audioInfo->stop();
+    toggleSuspend();
+    // void toggleSuspend();
     // emit pullModeChanged();
-     emit toggleSuspend();
+     // emit toggleSuspend();
 
 }
 
@@ -320,6 +330,9 @@ void InputTest::restartAudioStream()
 
             QByteArray buffer(len, 0);
             qint64 l = io->read(buffer.data(), len);
+
+            // qDebug() << "io->read(buffer.data(), len) "<<l;
+
             if (l > 0) {
                 const qreal level = m_audioInfo->calculateLevel(buffer.constData(), l);
                 m_canvas->setLevel(level);
